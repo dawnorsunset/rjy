@@ -1,0 +1,431 @@
+{% extends "admin-layout.html" %}
+{% block body %}
+<div class="card">
+	<div class="card-header">
+		<span class="card-title">用户管理</span>
+	</div>
+	
+	<div class="toolbar">
+		<div class="toolbar-left">
+			<button class="btn btn-primary" id="btnAddUser">
+				<i class="fa fa-plus"></i> 新增用户
+			</button>
+			<button class="btn btn-danger" id="btnBatchDelete">
+				<i class="fa fa-trash"></i> 批量删除
+			</button>
+		</div>
+		<div class="toolbar-right">
+			<div class="search-box">
+				<input type="text" id="searchKeyword" placeholder="搜索用户名..." value="{{ keyword }}">
+				<button class="btn btn-primary" id="btnSearch">
+					<i class="fa fa-search"></i> 搜索
+				</button>
+				<button class="btn btn-warning" id="btnReset">
+					<i class="fa fa-redo"></i> 重置
+				</button>
+			</div>
+		</div>
+	</div>
+	
+	<table class="data-table">
+		<thead>
+			<tr>
+				<th class="checkbox-cell">
+					<input type="checkbox" id="selectAll">
+				</th>
+				<th>ID</th>
+				<th>用户名</th>
+				<th>角色</th>
+				<th>创建时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody id="userTableBody">
+			{% for user in users %}
+			<tr>
+				<td class="checkbox-cell">
+					<input type="checkbox" class="user-checkbox" value="{{ user['id'] }}">
+				</td>
+				<td>{{ user['id'] }}</td>
+				<td>{{ user['username'] }}</td>
+				<td>
+					<select class="form-select role-select" data-user-id="{{ user['id'] }}" data-username="{{ user['username'] }}">
+						{% for role in roles %}
+						<option value="{{ role['id'] }}" {% if user.get('role_id') == role['id'] %}selected{% end %}>
+							{{ role['name'] }}
+						</option>
+						{% end %}
+					</select>
+				</td>
+				<td>{{ user['created_at'] }}</td>
+				<td>
+					<div class="action-buttons">
+						<button class="btn btn-sm btn-warning btn-edit" data-id="{{ user['id'] }}" data-username="{{ user['username'] }}">
+							<i class="fa fa-edit"></i> 编辑
+						</button>
+						<button class="btn btn-sm btn-info btn-password" data-id="{{ user['id'] }}" data-username="{{ user['username'] }}">
+							<i class="fa fa-key"></i> 密码
+						</button>
+						<button class="btn btn-sm btn-danger btn-delete" data-id="{{ user['id'] }}" data-username="{{ user['username'] }}">
+							<i class="fa fa-trash"></i> 删除
+						</button>
+					</div>
+				</td>
+			</tr>
+			{% end %}
+		</tbody>
+	</table>
+	
+	{% if not users %}
+	<div class="empty-data">
+		<i class="fa fa-inbox"></i>
+		<p>暂无用户数据</p>
+	</div>
+	{% end %}
+	
+	{% if total_pages > 1 %}
+	<div class="pagination">
+		{% if page > 1 %}
+		<a href="?page={{ page - 1 }}{% if keyword %}&keyword={{ keyword }}{% end %}">上一页</a>
+		{% else %}
+		<span class="disabled">上一页</span>
+		{% end %}
+		
+		{% for i in range(1, total_pages + 1) %}
+			{% if i == page %}
+			<span class="active">{{ i }}</span>
+			{% else %}
+			<a href="?page={{ i }}{% if keyword %}&keyword={{ keyword }}{% end %}">{{ i }}</a>
+			{% end %}
+		{% end %}
+		
+		{% if page < total_pages %}
+		<a href="?page={{ page + 1 }}{% if keyword %}&keyword={{ keyword }}{% end %}">下一页</a>
+		{% else %}
+		<span class="disabled">下一页</span>
+		{% end %}
+	</div>
+	{% end %}
+	
+	<div style="margin-top:15px; text-align:right; color:#999; font-size:13px;">
+		共 <strong>{{ total }}</strong> 条记录，第 <strong>{{ page }}</strong> / <strong>{{ total_pages }}</strong> 页
+	</div>
+</div>
+
+<!-- 新增用户模态框 -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">新增用户</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="addUserForm">
+					<div class="form-group">
+						<label>用户名</label>
+						<input type="text" name="username" required placeholder="请输入用户名">
+					</div>
+					<div class="form-group">
+						<label>密码</label>
+						<input type="password" name="password" required placeholder="请输入密码">
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="btnSubmitAdd">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 编辑用户模态框 -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">编辑用户</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="editUserForm">
+					<input type="hidden" name="user_id" id="editUserId">
+					<div class="form-group">
+						<label>用户名</label>
+						<input type="text" name="username" id="editUsername" required placeholder="请输入用户名">
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="btnSubmitEdit">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 修改密码模态框 -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">修改密码</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="changePasswordForm">
+					<input type="hidden" name="user_id" id="changePasswordUserId">
+					<div class="form-group">
+						<label>新密码</label>
+						<input type="password" name="password" id="changePassword" required placeholder="请输入新密码">
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="btnSubmitPassword">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	// 菜单切换
+	var menuToggles = document.querySelectorAll('.menu-toggle');
+	menuToggles.forEach(function(toggle) {
+		toggle.addEventListener('click', function(e) {
+			e.preventDefault();
+			var submenu = this.nextElementSibling;
+			if (submenu && submenu.classList.contains('submenu')) {
+				submenu.classList.toggle('show');
+				this.classList.toggle('active');
+			}
+		});
+	});
+
+	// 新增用户按钮
+	document.getElementById('btnAddUser').addEventListener('click', function() {
+		var modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+		document.getElementById('addUserForm').reset();
+		modal.show();
+	});
+
+	// 提交新增
+	document.getElementById('btnSubmitAdd').addEventListener('click', function() {
+		var form = document.getElementById('addUserForm');
+		var username = form.querySelector('input[name="username"]').value.trim();
+		var password = form.querySelector('input[name="password"]').value;
+		
+		if (!username || !password) {
+			alert('用户名和密码不能为空');
+			return;
+		}
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/admin/users?action=add', true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var response = JSON.parse(xhr.responseText);
+					if (response.code === 0) {
+						alert(response.msg);
+						window.location.href = '/admin/users';
+					} else {
+						alert(response.msg);
+					}
+				}
+			}
+		};
+		xhr.send('username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password));
+	});
+
+	// 编辑用户
+	document.querySelectorAll('.btn-edit').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			var id = this.getAttribute('data-id');
+			var username = this.getAttribute('data-username');
+			document.getElementById('editUserId').value = id;
+			document.getElementById('editUsername').value = username;
+			var modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+			modal.show();
+		});
+	});
+
+	// 修改密码
+	document.querySelectorAll('.btn-password').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			var id = this.getAttribute('data-id');
+			var username = this.getAttribute('data-username');
+			document.getElementById('changePasswordUserId').value = id;
+			document.getElementById('changePassword').value = '';
+			document.getElementById('changePassword').placeholder = '为用户 "' + username + '" 设置新密码';
+			var modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+			modal.show();
+		});
+	});
+
+	// 提交编辑
+	document.getElementById('btnSubmitEdit').addEventListener('click', function() {
+		var userId = document.getElementById('editUserId').value;
+		var username = document.getElementById('editUsername').value.trim();
+		
+		if (!userId || !username) {
+			alert('参数错误');
+			return;
+		}
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/admin/users?action=edit', true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var response = JSON.parse(xhr.responseText);
+					alert(response.msg);
+					if (response.code === 0) {
+						window.location.href = '/admin/users';
+					}
+				}
+			}
+		};
+		xhr.send('user_id=' + userId + '&username=' + encodeURIComponent(username));
+	});
+	
+	// 提交修改密码
+	document.getElementById('btnSubmitPassword').addEventListener('click', function() {
+		var userId = document.getElementById('changePasswordUserId').value;
+		var password = document.getElementById('changePassword').value;
+		
+		if (!userId || !password) {
+			alert('参数错误');
+			return;
+		}
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/admin/users?action=edit_password', true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var response = JSON.parse(xhr.responseText);
+					alert(response.msg);
+					if (response.code === 0) {
+						window.location.href = '/admin/users';
+					}
+				}
+			}
+		};
+		xhr.send('user_id=' + userId + '&password=' + encodeURIComponent(password));
+	});
+
+	// 删除用户
+	document.querySelectorAll('.btn-delete').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			var id = this.getAttribute('data-id');
+			var username = this.getAttribute('data-username');
+			if (confirm('确定要删除用户"' + username + '"吗？')) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', '/admin/users?action=delete', true);
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === 4) {
+						if (xhr.status === 200) {
+							var response = JSON.parse(xhr.responseText);
+							alert(response.msg);
+							if (response.code === 0) {
+								window.location.href = '/admin/users';
+							}
+						}
+					}
+				};
+				xhr.send('user_id=' + id);
+			}
+		});
+	});
+
+	// 全选/取消全选
+	document.getElementById('selectAll').addEventListener('change', function() {
+		var checkboxes = document.querySelectorAll('.user-checkbox');
+		checkboxes.forEach(function(cb) {
+			cb.checked = this.checked;
+		}.bind(this));
+	});
+
+	// 批量删除
+	document.getElementById('btnBatchDelete').addEventListener('click', function() {
+		var checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+		if (checkedBoxes.length === 0) {
+			alert('请选择要删除的用户');
+			return;
+		}
+		
+		if (confirm('确定要删除选中的 ' + checkedBoxes.length + ' 个用户吗？')) {
+			var ids = Array.from(checkedBoxes).map(function(cb) {
+				return cb.value;
+			}).join(',');
+			
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', '/admin/users?action=batch_delete', true);
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === 4) {
+					if (xhr.status === 200) {
+						var response = JSON.parse(xhr.responseText);
+						alert(response.msg);
+						if (response.code === 0) {
+							window.location.href = '/admin/users';
+						}
+					}
+				}
+			};
+			xhr.send('user_ids=' + ids);
+		}
+	});
+
+	// 搜索
+	document.getElementById('btnSearch').addEventListener('click', function() {
+		var keyword = document.getElementById('searchKeyword').value.trim();
+		window.location.href = '/admin/users?keyword=' + encodeURIComponent(keyword);
+	});
+
+	// 重置
+	document.getElementById('btnReset').addEventListener('click', function() {
+		document.getElementById('searchKeyword').value = '';
+		window.location.href = '/admin/users';
+	});
+	
+	// 角色选择变更
+	document.querySelectorAll('.role-select').forEach(function(select) {
+		select.addEventListener('change', function() {
+			var userId = this.getAttribute('data-user-id');
+			var username = this.getAttribute('data-username');
+			var roleId = this.value;
+			
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', '/admin/users?action=set_role', true);
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === 4) {
+					if (xhr.status === 200) {
+						var response = JSON.parse(xhr.responseText);
+						if (response.code === 0) {
+							// 显示成功提示（不刷新页面）
+							var originalText = select.options[select.selectedIndex].text;
+							alert('用户 "' + username + '" 的角色已设置为 "' + originalText + '"');
+						} else {
+							alert(response.msg);
+							// 恢复原来的选择
+							location.reload();
+						}
+					}
+				}
+			};
+			xhr.send('user_id=' + userId + '&role_id=' + roleId);
+		});
+	});
+});
+</script>
+{% end %}

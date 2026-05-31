@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{title}}</title>
+	<link rel="stylesheet" href="{{ static_url('dist/zujian/fontawesome-free-5.15.4-web/css/all.min.css') }}">
+	<link rel="stylesheet" href="{{ static_url('css/base.css') }}">
+	<link rel="stylesheet" href="{{ static_url('css/admin-login.css') }}">
+	<style>
+		
+	</style>
+</head>
+<body>
+	<div class="login-container">
+		<div class="login-wrapper">
+			<div class="login-left">
+				<div class="login-logo">
+					<i class="fa fa-shield-alt"></i>
+					<h1>智能瞭望与智能问数系统</h1>
+					<p>AI Intelligence System</p>
+				</div>
+				<div class="login-features">
+					<div class="feature-item">
+						<i class="fa fa-brain"></i>
+						<span>AI智能问数</span>
+					</div>
+					<div class="feature-item">
+						<i class="fa fa-eye"></i>
+						<span>智能瞭望监测</span>
+					</div>
+					<div class="feature-item">
+						<i class="fa fa-chart-line"></i>
+						<span>数据深度分析</span>
+					</div>
+				</div>
+			</div>
+			<div class="login-right">
+				<div class="login-form-wrapper">
+					<div class="login-header">
+						<h2>管理员登录</h2>
+						<p>请输入您的管理员账号和密码</p>
+					</div>
+					{% block body %}{% end %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="{{ static_url('js/base.js') }}"></script>
+</body>
+</html>

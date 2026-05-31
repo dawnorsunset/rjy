@@ -1,0 +1,274 @@
+{% extends "admin-layout.html" %}
+{% block body %}
+<div class="card">
+	<div class="card-header">
+		<span class="card-title">功能管理</span>
+	</div>
+	
+	<div class="toolbar">
+		<div class="toolbar-left">
+			<button class="btn btn-primary" id="btnAddFunction">
+				<i class="fa fa-plus"></i> 新增功能
+			</button>
+		</div>
+	</div>
+	
+	<table class="data-table">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>功能名称</th>
+				<th>功能编码</th>
+				<th>父级 ID</th>
+				<th>路由地址</th>
+				<th>图标</th>
+				<th>排序</th>
+				<th>是否菜单</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for func in functions %}
+			<tr>
+				<td>{{ func['id'] }}</td>
+				<td>{{ func['name'] }}</td>
+				<td>{{ func['code'] }}</td>
+				<td>{{ func['parent_id'] }}</td>
+				<td>{{ func['url'] or '-' }}</td>
+				<td><i class="{{ func['icon'] or 'fa fa-circle' }}"></i></td>
+				<td>{{ func['sort_order'] }}</td>
+				<td>{% if func['is_menu'] %}是{% else %}否{% end %}</td>
+				<td>
+					<div class="action-buttons">
+						<button class="btn btn-sm btn-warning btn-edit" data-id="{{ func['id'] }}">
+							<i class="fa fa-edit"></i> 编辑
+						</button>
+						<button class="btn btn-sm btn-danger btn-delete" data-id="{{ func['id'] }}">
+							<i class="fa fa-trash"></i> 删除
+						</button>
+					</div>
+				</td>
+			</tr>
+			{% end %}
+		</tbody>
+	</table>
+	
+	{% if not functions %}
+	<div class="empty-data">
+		<i class="fa fa-inbox"></i>
+		<p>暂无功能数据</p>
+	</div>
+	{% end %}
+</div>
+
+<!-- 新增功能模态框 -->
+<div class="modal fade" id="addFunctionModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">新增功能</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="addFunctionForm">
+					<div class="form-group">
+						<label>功能名称</label>
+						<input type="text" name="name" required placeholder="请输入功能名称">
+					</div>
+					<div class="form-group">
+						<label>功能编码</label>
+						<input type="text" name="code" required placeholder="请输入功能编码（唯一）">
+					</div>
+					<div class="form-group">
+						<label>父级 ID</label>
+						<input type="number" name="parent_id" value="0" placeholder="0 表示一级菜单">
+					</div>
+					<div class="form-group">
+						<label>路由地址</label>
+						<input type="text" name="url" placeholder="/admin/xxx">
+					</div>
+					<div class="form-group">
+						<label>图标</label>
+						<input type="text" name="icon" placeholder="fa fa-home">
+					</div>
+					<div class="form-group">
+						<label>排序</label>
+						<input type="number" name="sort_order" value="0">
+					</div>
+					<div class="form-group">
+						<label>是否菜单</label>
+						<select name="is_menu">
+							<option value="1">是</option>
+							<option value="0">否</option>
+						</select>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="btnSubmitAdd">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 编辑功能模态框 -->
+<div class="modal fade" id="editFunctionModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">编辑功能</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="editFunctionForm">
+					<input type="hidden" name="func_id" id="editFuncId">
+					<div class="form-group">
+						<label>功能名称</label>
+						<input type="text" name="name" id="editName" required>
+					</div>
+					<div class="form-group">
+						<label>功能编码</label>
+						<input type="text" name="code" id="editCode" required>
+					</div>
+					<div class="form-group">
+						<label>父级 ID</label>
+						<input type="number" name="parent_id" id="editParentId">
+					</div>
+					<div class="form-group">
+						<label>路由地址</label>
+						<input type="text" name="url" id="editUrl">
+					</div>
+					<div class="form-group">
+						<label>图标</label>
+						<input type="text" name="icon" id="editIcon">
+					</div>
+					<div class="form-group">
+						<label>排序</label>
+						<input type="number" name="sort_order" id="editSortOrder">
+					</div>
+					<div class="form-group">
+						<label>是否菜单</label>
+						<select name="is_menu" id="editIsMenu">
+							<option value="1">是</option>
+							<option value="0">否</option>
+						</select>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="btnSubmitEdit">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	// 新增功能按钮
+	document.getElementById('btnAddFunction').addEventListener('click', function() {
+		var modal = new bootstrap.Modal(document.getElementById('addFunctionModal'));
+		document.getElementById('addFunctionForm').reset();
+		modal.show();
+	});
+	
+	// 提交新增
+	document.getElementById('btnSubmitAdd').addEventListener('click', function() {
+		var form = document.getElementById('addFunctionForm');
+		var formData = new FormData(form);
+		formData.append('action', 'add');
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/admin/functions', true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var response = JSON.parse(xhr.responseText);
+					if (response.code === 0) {
+						alert(response.msg);
+						window.location.href = '/admin/functions';
+					} else {
+						alert(response.msg);
+					}
+				}
+			}
+		};
+		
+		var params = new URLSearchParams(formData).toString();
+		xhr.send(params);
+	});
+	
+	// 编辑功能
+	document.querySelectorAll('.btn-edit').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			var id = this.getAttribute('data-id');
+			var row = this.closest('tr');
+			var cells = row.querySelectorAll('td');
+			
+			document.getElementById('editFuncId').value = id;
+			document.getElementById('editName').value = cells[1].textContent;
+			document.getElementById('editCode').value = cells[2].textContent;
+			document.getElementById('editParentId').value = cells[3].textContent;
+			document.getElementById('editUrl').value = cells[4].textContent === '-' ? '' : cells[4].textContent;
+			document.getElementById('editIcon').value = cells[5].querySelector('i') ? cells[5].querySelector('i').className : '';
+			document.getElementById('editSortOrder').value = cells[6].textContent;
+			document.getElementById('editIsMenu').value = cells[7].textContent === '是' ? '1' : '0';
+			
+			var modal = new bootstrap.Modal(document.getElementById('editFunctionModal'));
+			modal.show();
+		});
+	});
+	
+	// 提交编辑
+	document.getElementById('btnSubmitEdit').addEventListener('click', function() {
+		var form = document.getElementById('editFunctionForm');
+		var formData = new FormData(form);
+		formData.append('action', 'edit');
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/admin/functions', true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var response = JSON.parse(xhr.responseText);
+					alert(response.msg);
+					if (response.code === 0) {
+						window.location.href = '/admin/functions';
+					}
+				}
+			}
+		};
+		
+		var params = new URLSearchParams(formData).toString();
+		xhr.send(params);
+	});
+	
+	// 删除功能
+	document.querySelectorAll('.btn-delete').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			var id = this.getAttribute('data-id');
+			if (confirm('确定要删除此功能吗？')) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', '/admin/functions?action=delete', true);
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === 4) {
+						if (xhr.status === 200) {
+							var response = JSON.parse(xhr.responseText);
+							alert(response.msg);
+							if (response.code === 0) {
+								window.location.href = '/admin/functions';
+							}
+						}
+					}
+				};
+				xhr.send('func_id=' + id);
+			}
+		});
+	});
+});
+</script>
+{% end %}

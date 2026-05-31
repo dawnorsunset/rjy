@@ -1,0 +1,159 @@
+{% extends "admin-layout.html" %}
+{% block body %}
+<div class="card">
+	<div class="card-header">
+		<span class="card-title">权限管理</span>
+	</div>
+	
+	<div class="form-group" style="max-width: 400px; margin-bottom: 20px;">
+		<label>选择角色</label>
+		<select id="roleSelect" class="form-select">
+			<option value="">-- 请选择角色 --</option>
+			{% for role in roles %}
+			<option value="{{ role['id'] }}" {% if selected_role_id == role['id'] %}selected{% end %}>
+				{{ role['name'] }}
+			</option>
+			{% end %}
+		</select>
+	</div>
+	
+	{% if selected_role_id %}
+	<div class="permission-tree">
+		<h4>功能权限</h4>
+		<div class="tree-container">
+			{% for menu in menu_tree %}
+			<div class="tree-node">
+				<label class="tree-label">
+					<input type="checkbox" class="permission-checkbox" value="{{ menu['id'] }}" {% if menu['id'] in selected_permissions %}checked{% end %}>
+					<i class="{{ menu['icon'] or 'fa fa-folder' }}"></i>
+					<span>{{ menu['name'] }}</span>
+				</label>
+				{% if menu['children'] %}
+				<div class="tree-children">
+					{% for child in menu['children'] %}
+					<label class="tree-label">
+						<input type="checkbox" class="permission-checkbox" value="{{ child['id'] }}" {% if child['id'] in selected_permissions %}checked{% end %}>
+						<i class="{{ child['icon'] or 'fa fa-file' }}"></i>
+						<span>{{ child['name'] }}</span>
+					</label>
+					{% end %}
+				</div>
+				{% end %}
+			</div>
+			{% end %}
+		</div>
+		
+		<div class="form-actions" style="margin-top: 20px;">
+			<button class="btn btn-primary" id="btnSavePermissions">
+				<i class="fa fa-save"></i> 保存权限
+			</button>
+		</div>
+	</div>
+	{% else %}
+	<div class="empty-data">
+		<i class="fa fa-hand-pointer"></i>
+		<p>请先选择一个角色</p>
+	</div>
+	{% end %}
+</div>
+
+<style>
+.permission-tree {
+	margin-top: 20px;
+}
+
+.tree-container {
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 15px;
+	background: #f9f9f9;
+	max-height: 500px;
+	overflow-y: auto;
+}
+
+.tree-node {
+	margin-bottom: 10px;
+}
+
+.tree-label {
+	display: flex;
+	align-items: center;
+	padding: 8px 12px;
+	cursor: pointer;
+	border-radius: 4px;
+}
+
+.tree-label:hover {
+	background: #e9ecef;
+}
+
+.tree-label input[type="checkbox"] {
+	margin-right: 10px;
+}
+
+.tree-label i {
+	margin-right: 8px;
+	color: #6c757d;
+}
+
+.tree-label span {
+	font-weight: 500;
+}
+
+.tree-children {
+	margin-left: 30px;
+	margin-top: 5px;
+}
+
+.tree-children .tree-label {
+	padding: 6px 10px;
+}
+
+.tree-children .tree-label i {
+	color: #17a2b8;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	// 角色选择变更
+	document.getElementById('roleSelect').addEventListener('change', function() {
+		var roleId = this.value;
+		if (roleId) {
+			window.location.href = '/admin/permissions?role_id=' + roleId;
+		}
+	});
+	
+	// 保存权限
+	document.getElementById('btnSavePermissions').addEventListener('click', function() {
+		var roleId = document.getElementById('roleSelect').value;
+		if (!roleId) {
+			alert('请先选择一个角色');
+			return;
+		}
+		
+		var checkboxes = document.querySelectorAll('.permission-checkbox:checked');
+		var functionIds = Array.from(checkboxes).map(function(cb) {
+			return cb.value;
+		}).join(',');
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/admin/permissions?action=save', true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var response = JSON.parse(xhr.responseText);
+					if (response.code === 0) {
+						alert(response.msg);
+					} else {
+						alert(response.msg);
+					}
+				}
+			}
+		};
+		xhr.send('role_id=' + roleId + '&function_ids=' + functionIds);
+	});
+});
+</script>
+{% end %}

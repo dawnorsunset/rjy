@@ -1,0 +1,324 @@
+/* Copyright (c) 2026 新疆幻城网安科技有限责任公司
+ * All rights reserved.
+ * 官方网站：https://www.hcnsec.cn/
+ */
+
+/* 后台登录页样式 - 响应式、沉浸式、自适应设计 */
+
+.login-container {
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+	position: relative;
+	overflow: hidden;
+}
+
+.login-container::before {
+	content: '';
+	position: absolute;
+	width: 400px;
+	height: 400px;
+	background: radial-gradient(circle, rgba(0,136,255,0.15) 0%, transparent 70%);
+	top: -100px;
+	right: -100px;
+	border-radius: 50%;
+}
+
+.login-container::after {
+	content: '';
+	position: absolute;
+	width: 300px;
+	height: 300px;
+	background: radial-gradient(circle, rgba(67,97,238,0.15) 0%, transparent 70%);
+	bottom: -50px;
+	left: -50px;
+	border-radius: 50%;
+}
+
+.login-wrapper {
+	display: flex;
+	width: 900px;
+	max-width: 95%;
+	height: 550px;
+	max-height: 90vh;
+	background: rgba(255,255,255,0.98);
+	border-radius: 16px;
+	box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+	overflow: hidden;
+	position: relative;
+	z-index: 1;
+}
+
+.login-left {
+	width: 45%;
+	background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+	padding: 40px 30px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color: #fff;
+	position: relative;
+}
+
+.login-logo {
+	text-align: center;
+	margin-bottom: 40px;
+}
+
+.login-logo i {
+	font-size: 48px;
+	color: #4361ee;
+	margin-bottom: 15px;
+	display: block;
+}
+
+.login-logo h1 {
+	font-size: 20px;
+	font-weight: 600;
+	margin-bottom: 8px;
+	letter-spacing: 1px;
+}
+
+.login-logo p {
+	font-size: 12px;
+	color: rgba(255,255,255,0.6);
+	letter-spacing: 2px;
+}
+
+.login-features {
+	width: 100%;
+}
+
+.feature-item {
+	display: flex;
+	align-items: center;
+	padding: 12px 15px;
+	margin-bottom: 12px;
+	background: rgba(255,255,255,0.08);
+	border-radius: 8px;
+	transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+	background: rgba(255,255,255,0.15);
+	transform: translateX(5px);
+}
+
+.feature-item i {
+	font-size: 18px;
+	color: #4361ee;
+	margin-right: 12px;
+	width: 24px;
+	text-align: center;
+}
+
+.feature-item span {
+	font-size: 13px;
+	color: rgba(255,255,255,0.85);
+}
+
+.login-right {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 40px;
+	background: #fff;
+}
+
+.login-form-wrapper {
+	width: 100%;
+	max-width: 360px;
+}
+
+.login-header {
+	text-align: center;
+	margin-bottom: 35px;
+}
+
+.login-header h2 {
+	font-size: 24px;
+	color: #1a1a2e;
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.login-header p {
+	font-size: 13px;
+	color: #888;
+}
+
+.login-form .form-group {
+	margin-bottom: 20px;
+}
+
+.login-form label {
+	display: block;
+	font-size: 13px;
+	color: #555;
+	margin-bottom: 6px;
+	font-weight: 500;
+}
+
+.login-form .input-wrapper {
+	position: relative;
+}
+
+.login-form .input-wrapper i {
+	position: absolute;
+	left: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #aaa;
+	font-size: 14px;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+	width: 100%;
+	padding: 12px 12px 12px 38px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	font-size: 14px;
+	transition: all 0.3s ease;
+	background: #f8f9fa;
+}
+
+.login-form input[type="text"]:focus,
+.login-form input[type="password"]:focus {
+	border-color: #4361ee;
+	background: #fff;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(67,97,238,0.1);
+}
+
+.login-form .remember-forgot {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 25px;
+	font-size: 13px;
+}
+
+.login-form .remember-forgot label {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	color: #666;
+	margin-bottom: 0;
+}
+
+.login-form .remember-forgot input[type="checkbox"] {
+	margin-right: 6px;
+}
+
+.login-form .remember-forgot a {
+	color: #4361ee;
+	text-decoration: none;
+}
+
+.login-form .remember-forgot a:hover {
+	text-decoration: underline;
+}
+
+.login-form .submit-btn {
+	width: 100%;
+	padding: 13px;
+	background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+	border: none;
+	border-radius: 8px;
+	color: #fff;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	letter-spacing: 1px;
+}
+
+.login-form .submit-btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 5px 20px rgba(67,97,238,0.4);
+}
+
+.login-form .submit-btn:active {
+	transform: translateY(0);
+}
+
+.error-message {
+	background: #fff2f0;
+	border: 1px solid #ffccc7;
+	color: #ff4d4f;
+	padding: 10px 15px;
+	border-radius: 6px;
+	margin-bottom: 20px;
+	font-size: 13px;
+	display: flex;
+	align-items: center;
+}
+
+.error-message i {
+	margin-right: 8px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+	.login-wrapper {
+		flex-direction: column;
+		height: auto;
+		max-height: 95vh;
+	}
+
+	.login-left {
+		width: 100%;
+		padding: 30px 20px;
+		min-height: 200px;
+	}
+
+	.login-logo {
+		margin-bottom: 20px;
+	}
+
+	.login-logo i {
+		font-size: 36px;
+	}
+
+	.login-logo h1 {
+		font-size: 16px;
+	}
+
+	.login-features {
+		display: none;
+	}
+
+	.login-right {
+		padding: 30px 20px;
+	}
+
+	.login-header h2 {
+		font-size: 20px;
+	}
+}
+
+@media (max-width: 480px) {
+	.login-container {
+		padding: 10px;
+		align-items: flex-start;
+		padding-top: 30px;
+	}
+
+	.login-wrapper {
+		border-radius: 12px;
+	}
+
+	.login-form-wrapper {
+		max-width: 100%;
+	}
+
+	.login-header p {
+		display: none;
+	}
+}

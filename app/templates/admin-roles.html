@@ -1,0 +1,220 @@
+{% extends "admin-layout.html" %}
+{% block body %}
+<div class="card">
+	<div class="card-header">
+		<span class="card-title">角色管理</span>
+	</div>
+	
+	<div class="toolbar">
+		<div class="toolbar-left">
+			<button class="btn btn-primary" id="btnAddRole">
+				<i class="fa fa-plus"></i> 新增角色
+			</button>
+		</div>
+	</div>
+	
+	<table class="data-table">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>角色名称</th>
+				<th>描述</th>
+				<th>系统角色</th>
+				<th>创建时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for role in roles %}
+			<tr>
+				<td>{{ role['id'] }}</td>
+				<td>{{ role['name'] }}</td>
+				<td>{{ role['description'] or '-' }}</td>
+				<td>{% if role['is_system'] %}是{% else %}否{% end %}</td>
+				<td>{{ role['created_at'] }}</td>
+				<td>
+					<div class="action-buttons">
+						<button class="btn btn-sm btn-warning btn-edit" data-id="{{ role['id'] }}" data-name="{{ role['name'] }}" data-description="{{ role['description'] }}">
+							<i class="fa fa-edit"></i> 编辑
+						</button>
+						{% if not role['is_system'] %}
+						<button class="btn btn-sm btn-danger btn-delete" data-id="{{ role['id'] }}" data-name="{{ role['name'] }}">
+							<i class="fa fa-trash"></i> 删除
+						</button>
+						{% end %}
+					</div>
+				</td>
+			</tr>
+			{% end %}
+		</tbody>
+	</table>
+	
+	{% if not roles %}
+	<div class="empty-data">
+		<i class="fa fa-inbox"></i>
+		<p>暂无角色数据</p>
+	</div>
+	{% end %}
+</div>
+
+<!-- 新增角色模态框 -->
+<div class="modal fade" id="addRoleModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">新增角色</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="addRoleForm">
+					<div class="form-group">
+						<label>角色名称</label>
+						<input type="text" name="name" required placeholder="请输入角色名称">
+					</div>
+					<div class="form-group">
+						<label>描述</label>
+						<textarea name="description" rows="3" placeholder="请输入角色描述"></textarea>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="btnSubmitAdd">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 编辑角色模态框 -->
+<div class="modal fade" id="editRoleModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">编辑角色</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="editRoleForm">
+					<input type="hidden" name="role_id" id="editRoleId">
+					<div class="form-group">
+						<label>角色名称</label>
+						<input type="text" name="name" id="editRoleName" required>
+					</div>
+					<div class="form-group">
+						<label>描述</label>
+						<textarea name="description" id="editRoleDescription" rows="3"></textarea>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="btnSubmitEdit">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	// 新增角色按钮
+	document.getElementById('btnAddRole').addEventListener('click', function() {
+		var modal = new bootstrap.Modal(document.getElementById('addRoleModal'));
+		document.getElementById('addRoleForm').reset();
+		modal.show();
+	});
+	
+	// 提交新增
+	document.getElementById('btnSubmitAdd').addEventListener('click', function() {
+		var form = document.getElementById('addRoleForm');
+		var formData = new FormData(form);
+		formData.append('action', 'add');
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/admin/roles', true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var response = JSON.parse(xhr.responseText);
+					if (response.code === 0) {
+						alert(response.msg);
+						window.location.href = '/admin/roles';
+					} else {
+						alert(response.msg);
+					}
+				}
+			}
+		};
+		
+		var params = new URLSearchParams(formData).toString();
+		xhr.send(params);
+	});
+	
+	// 编辑角色
+	document.querySelectorAll('.btn-edit').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			var id = this.getAttribute('data-id');
+			var name = this.getAttribute('data-name');
+			var description = this.getAttribute('data-description');
+			
+			document.getElementById('editRoleId').value = id;
+			document.getElementById('editRoleName').value = name;
+			document.getElementById('editRoleDescription').value = description || '';
+			
+			var modal = new bootstrap.Modal(document.getElementById('editRoleModal'));
+			modal.show();
+		});
+	});
+	
+	// 提交编辑
+	document.getElementById('btnSubmitEdit').addEventListener('click', function() {
+		var form = document.getElementById('editRoleForm');
+		var formData = new FormData(form);
+		formData.append('action', 'edit');
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/admin/roles', true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var response = JSON.parse(xhr.responseText);
+					alert(response.msg);
+					if (response.code === 0) {
+						window.location.href = '/admin/roles';
+					}
+				}
+			}
+		};
+		
+		var params = new URLSearchParams(formData).toString();
+		xhr.send(params);
+	});
+	
+	// 删除角色
+	document.querySelectorAll('.btn-delete').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			var id = this.getAttribute('data-id');
+			var name = this.getAttribute('data-name');
+			if (confirm('确定要删除角色"' + name + '"吗？')) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', '/admin/roles?action=delete', true);
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === 4) {
+						if (xhr.status === 200) {
+							var response = JSON.parse(xhr.responseText);
+							alert(response.msg);
+							if (response.code === 0) {
+								window.location.href = '/admin/roles';
+							}
+						}
+					}
+				};
+				xhr.send('role_id=' + id);
+			}
+		});
+	});
+});
+</script>
+{% end %}

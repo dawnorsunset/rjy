@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{title}}</title>
+	<link rel="stylesheet" href="{{ static_url('dist/zujian/fontawesome-free-5.15.4-web/css/all.min.css') }}">
+	<link rel="stylesheet" href="{{ static_url('css/user-login.css') }}">
+	<style>
+		
+	</style>
+</head>
+<body>
+	<div class="login-page">
+		<div class="login-container">
+			<div class="login-left">
+				<div class="login-illustration">
+					<i class="fa fa-laptop-code"></i>
+					<h3>智能瞭望与智能问数系统</h3>
+					<p>AI Intelligence System</p>
+				</div>
+			</div>
+			<div class="login-right">
+				<div class="login-header">
+					<h2>用户登录</h2>
+					<p>THE USER LOGIN</p>
+				</div>
+				{% block body %}{% end %}
+			</div>
+		</div>
+	</div>
+</body>
+</html>

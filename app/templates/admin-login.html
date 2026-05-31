@@ -1,0 +1,41 @@
+{% extends "admin-base.html" %}
+
+{% block body %}
+<form method="post" action="/admin/login" class="login-form">
+	{% module xsrf_form_html() %}
+	
+	{% if error %}
+	<div class="error-message">
+		<i class="fa fa-exclamation-circle"></i>
+		<span>{{ error }}</span>
+	</div>
+	{% end %}
+	
+	<div class="form-group">
+		<label for="username">用户名</label>
+		<div class="input-wrapper">
+			<i class="fa fa-user"></i>
+			<input type="text" id="username" name="username" placeholder="请输入用户名" required autofocus>
+		</div>
+	</div>
+	
+	<div class="form-group">
+		<label for="password">密码</label>
+		<div class="input-wrapper">
+			<i class="fa fa-lock"></i>
+			<input type="password" id="password" name="password" placeholder="请输入密码" required>
+		</div>
+	</div>
+	
+	<div class="remember-forgot">
+		<label>
+			<input type="checkbox" name="remember"> 记住我
+		</label>
+		<a href="#">忘记密码?</a>
+	</div>
+	
+	<button type="submit" class="submit-btn">
+		<i class="fa fa-sign-in-alt"></i> 登 录
+	</button>
+</form>
+{% end %}

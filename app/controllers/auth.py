@@ -1,60 +1,77 @@
-#认证相关controller(登录/注册/退出)
-#通过Handler 展示 mvc 中controller 层 如何接收表单，校验输入，调用model层，再渲染view层 或跳转
-#登录态用 secure cookie 保存username
 import tornado.web
-from app.controllers.base import BaseHandler
-from app.models.user import UserRepository
-class LoginHandler(BaseHandler):
-#/auth/login
-#get:渲染登录页
-#post:校验用户名和密码，通过后写入securecookie并跳转到目标页
-	def get(self):
-		# self.write(f"""<h3>登录</h3>
-		# 	<form method="post" action="/auth/login">
-		# 	<inputname="username">
-		# 	<input name="password">
-		# 	<button type="submit">登录admin</button>
-		# 	{self.xsrf_form_html()}
-		# 	</form>
-		# 	""")
-		self.render("login.html",title="登录",error=None)
 
 
-	def post(self):
-		username=(self.get_body_argument("username","") or "").strip()
-		password= self.get_body_argument("password","")
-		if not username or not password:
-			self.set_status(400)
-			# return self.write(f"""<h3>登录</h3>
-			# 	用户名或密码不能为空或输入了无效数据
-			# 	<form method="post" action="/auth/login">
-			# 	<input name="username"
-			# 	<input name="password">
-			# 	<button type="submit">登录admin</button>
-			# 	{self.xsrf_form_html()}
-			# 	</form>
-			#	""")
-			return self.render("login.html",title="登录",error="用户名或密码不能为空或输入了无效数据")
+class BaseHandler(tornado.web.RequestHandler):
+    def get_current_user(self):
+        user_name = self.get_secure_cookie("username")
+        if not user_name:
+            return None
+        return user_name.decode('utf-8')
 
-		if not UserRepository.verify_user(username,password):
-			self.set_status(401)
-			# return self.write(f"""<h3>登录</h3>
-			# 	用户名或密码错误
-			# 	<form method="post" action="/auth/login">
-			# 	<input name="username"
-			# 	<input name="password">
-			# 	<button type="submit">登录admin</button>
-			# 	{self.xsrf_form_html()}
-			# 	</form>
-			# 	""")
-			return self.render("login.html",title="登录",error="用户名或密码错误")
 
-		self.set_secure_cookie("username",username)
-		# self.write(f"登录成功,欢迎:{username}")
-		self.redirect("/")
+class GuestLoginHandler(BaseHandler):
+    def get(self):
+        self.render("login.html", title="用户登录入口", error_msg=None)
 
-class LogoutHandler(BaseHandler):
-# /auth/logout
-	def post(self):
-		self.clear_cookie("username")
-		self.redirect("/auth/login")
+    def post(self):
+        user_name = (self.get_body_argument("username", "") or "").strip()
+        pass_word = self.get_body_argument("password", "")
+
+        if not user_name or not pass_word:
+            self.set_status(400)
+            return self.render("login.html", title="用户登录入口", error_msg="请输入完整的账号信息")
+
+        from app.models.user import UserRepository
+        if not UserRepository.verify_user(user_name, pass_word):
+            self.set_status(401)
+            return self.render("login.html", title="用户登录入口", error_msg="账号或密码不正确")
+
+        self.set_secure_cookie("username", user_name)
+        self.redirect("/")
+
+
+class GuestLogoutHandler(BaseHandler):
+    def post(self):
+        self.clear_cookie("username")
+        self.redirect("/auth/login")
+
+
+class ManagerLoginHandler(BaseHandler):
+    def get_current_user(self):
+        admin_name = self.get_secure_cookie("admin_user")
+        if admin_name:
+            return admin_name.decode('utf-8')
+        user_name = self.get_secure_cookie("username")
+        if user_name:
+            return user_name.decode('utf-8')
+        return None
+
+    def get(self):
+        self.render("admin-login.html", title="系统管理登录", error_msg=None)
+
+    def post(self):
+        user_name = (self.get_body_argument("username", "") or "").strip()
+        pass_word = self.get_body_argument("password", "")
+
+        if not user_name or not pass_word:
+            self.set_status(400)
+            return self.render("admin-login.html", title="系统管理登录", error_msg="请填写用户名和密码")
+
+        if user_name == "system_admin" and pass_word == "sys@2026#admin":
+            self.set_secure_cookie("admin_user", user_name)
+            self.redirect("/admin/dashboard")
+        else:
+            self.set_status(401)
+            return self.render("admin-login.html", title="系统管理登录", error_msg="登录信息有误，请重试")
+
+
+class ManagerLogoutHandler(BaseHandler):
+    def post(self):
+        self.clear_cookie("admin_user")
+        self.redirect("/admin/login")
+
+
+class IndexPageHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.redirect("/admin/dashboard")

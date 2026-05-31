@@ -1,0 +1,522 @@
+/* Copyright (c) 2026 新疆幻城网安科技有限责任公司
+ * All rights reserved.
+ * 官方网站：https://www.hcnsec.cn/
+ */
+
+/* 后台管理系统样式 */
+
+/* 顶部导航栏 */
+.admin-header {
+	height: 60px;
+	background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 20px;
+	box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+}
+
+.header-left {
+	display: flex;
+	align-items: center;
+}
+
+.logo {
+	display: flex;
+	align-items: center;
+	color: #fff;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.logo i {
+	font-size: 24px;
+	color: #4361ee;
+	margin-right: 10px;
+}
+
+.header-right {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.user-info {
+	display: flex;
+	align-items: center;
+	color: rgba(255,255,255,0.8);
+	font-size: 14px;
+}
+
+.user-info i {
+	margin-right: 6px;
+	font-size: 18px;
+}
+
+.btn-logout {
+	padding: 6px 15px;
+	background: rgba(255,255,255,0.1);
+	border: 1px solid rgba(255,255,255,0.2);
+	color: #fff;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+	transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+	background: rgba(255,255,255,0.2);
+}
+
+/* 主体布局 */
+.admin-container {
+	display: flex;
+	margin-top: 60px;
+	height: calc(100vh - 60px);
+}
+
+/* 左侧菜单 */
+.admin-sidebar {
+	width: 220px;
+	background: #fff;
+	border-right: 1px solid #eee;
+	overflow-y: auto;
+	box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+}
+
+.sidebar-menu {
+	list-style: none;
+	padding: 10px 0;
+}
+
+.menu-item {
+	margin-bottom: 2px;
+}
+
+.menu-link {
+	display: flex;
+	align-items: center;
+	padding: 12px 20px;
+	color: #333;
+	text-decoration: none;
+	transition: all 0.3s ease;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.menu-link:hover {
+	background: #f5f7fa;
+	color: #4361ee;
+}
+
+.menu-link.active {
+	background: linear-gradient(90deg, rgba(67,97,238,0.1) 0%, transparent 100%);
+	color: #4361ee;
+	border-right: 3px solid #4361ee;
+}
+
+.menu-link i:first-child {
+	margin-right: 10px;
+	width: 16px;
+	text-align: center;
+}
+
+.menu-arrow {
+	margin-left: auto;
+	font-size: 12px;
+	transition: transform 0.3s ease;
+}
+
+.menu-toggle.active .menu-arrow {
+	transform: rotate(180deg);
+}
+
+/* 子菜单 */
+.submenu {
+	list-style: none;
+	display: none;
+	background: #fafbfc;
+}
+
+.submenu.show {
+	display: block;
+}
+
+.submenu li a {
+	display: block;
+	padding: 10px 20px 10px 46px;
+	color: #666;
+	text-decoration: none;
+	font-size: 13px;
+	transition: all 0.3s ease;
+}
+
+.submenu li a:hover {
+	color: #4361ee;
+	background: #f0f2f5;
+}
+
+.submenu li a.active {
+	color: #4361ee;
+	background: #eef0ff;
+}
+
+/* 右侧工作区 */
+.admin-main {
+	flex: 1;
+	overflow-y: auto;
+	background: #f5f7fa;
+}
+
+.main-content {
+	padding: 20px;
+}
+
+/* 卡片样式 */
+.card {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	padding: 20px;
+	margin-bottom: 20px;
+}
+
+.card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #eee;
+}
+
+.card-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: #333;
+}
+
+/* 表格样式 */
+.data-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.data-table thead {
+	background: #f8f9fa;
+}
+
+.data-table th {
+	padding: 12px 15px;
+	text-align: left;
+	font-weight: 600;
+	color: #555;
+	font-size: 13px;
+	border-bottom: 2px solid #dee2e6;
+}
+
+.data-table td {
+	padding: 12px 15px;
+	border-bottom: 1px solid #eee;
+	font-size: 13px;
+	color: #666;
+}
+
+.data-table tbody tr:hover {
+	background: #f8f9fa;
+}
+
+/* 按钮样式 */
+.btn {
+	padding: 8px 16px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+	transition: all 0.3s ease;
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.btn-primary {
+	background: #4361ee;
+	color: #fff;
+}
+
+.btn-primary:hover {
+	background: #3a56d4;
+}
+
+.btn-success {
+	background: #2ecc71;
+	color: #fff;
+}
+
+.btn-success:hover {
+	background: #27ae60;
+}
+
+.btn-danger {
+	background: #e74c3c;
+	color: #fff;
+}
+
+.btn-danger:hover {
+	background: #c0392b;
+}
+
+.btn-warning {
+	background: #f39c12;
+	color: #fff;
+}
+
+.btn-warning:hover {
+	background: #e67e22;
+}
+
+.btn-info {
+	background: #3498db;
+	color: #fff;
+}
+
+.btn-info:hover {
+	background: #2980b9;
+}
+
+.btn-sm {
+	padding: 5px 10px;
+	font-size: 12px;
+}
+
+/* 分页样式 */
+.pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
+	margin-top: 20px;
+}
+
+.pagination a, .pagination span {
+	padding: 6px 12px;
+	border: 1px solid #dee2e6;
+	border-radius: 4px;
+	text-decoration: none;
+	color: #333;
+	font-size: 13px;
+	transition: all 0.3s ease;
+}
+
+.pagination a:hover {
+	background: #4361ee;
+	color: #fff;
+	border-color: #4361ee;
+}
+
+.pagination .active {
+	background: #4361ee;
+	color: #fff;
+	border-color: #4361ee;
+}
+
+.pagination .disabled {
+	color: #ccc;
+	cursor: not-allowed;
+}
+
+/* 工具栏 */
+.toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 15px;
+}
+
+.toolbar-left {
+	display: flex;
+	gap: 10px;
+}
+
+.toolbar-right {
+	display: flex;
+	gap: 10px;
+}
+
+/* 搜索框 */
+.search-box {
+	display: flex;
+	gap: 10px;
+}
+
+.search-box input {
+	padding: 8px 12px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 13px;
+	width: 200px;
+}
+
+.search-box input:focus {
+	outline: none;
+	border-color: #4361ee;
+}
+
+/* 表单样式 */
+.form-group {
+	margin-bottom: 15px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 5px;
+	font-weight: 500;
+	color: #555;
+	font-size: 13px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"],
+.form-group select,
+.form-group textarea {
+	width: 100%;
+	padding: 8px 12px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 13px;
+	transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+	outline: none;
+	border-color: #4361ee;
+}
+
+/* 复选框样式 */
+.checkbox-cell {
+	width: 40px;
+	text-align: center;
+}
+
+.checkbox-cell input[type="checkbox"] {
+	cursor: pointer;
+}
+
+/* 操作按钮组 */
+.action-buttons {
+	display: flex;
+	gap: 5px;
+}
+
+/* 空数据提示 */
+.empty-data {
+	text-align: center;
+	padding: 40px;
+	color: #999;
+}
+
+.empty-data i {
+	font-size: 48px;
+	margin-bottom: 15px;
+	display: block;
+}
+
+/* 统计卡片 */
+.stats-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 15px;
+	margin-bottom: 20px;
+}
+
+.stat-card {
+	background: #fff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	display: flex;
+	align-items: center;
+}
+
+.stat-icon {
+	width: 50px;
+	height: 50px;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 15px;
+}
+
+.stat-icon i {
+	font-size: 24px;
+	color: #fff;
+}
+
+.stat-icon.blue {
+	background: linear-gradient(135deg, #4361ee, #3a0ca3);
+}
+
+.stat-icon.green {
+	background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.stat-icon.orange {
+	background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+.stat-icon.red {
+	background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.stat-info h3 {
+	font-size: 24px;
+	color: #333;
+	margin-bottom: 3px;
+}
+
+.stat-info p {
+	font-size: 12px;
+	color: #999;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+	.admin-sidebar {
+		width: 60px;
+	}
+
+	.menu-link span,
+	.menu-arrow {
+		display: none;
+	}
+
+	.menu-link {
+		justify-content: center;
+		padding: 15px;
+	}
+
+	.menu-link i:first-child {
+		margin-right: 0;
+	}
+
+	.submenu {
+		display: none !important;
+	}
+
+	.logo span {
+		display: none;
+	}
+
+	.user-info span {
+		display: none;
+	}
+}

@@ -1,0 +1,82 @@
+{% extends "admin-layout.html" %}
+{% block body %}
+<div class="card">
+	<div class="card-header">
+		<span class="card-title">新增用户</span>
+	</div>
+	<div style="max-width:500px;">
+		<form id="addUserPageForm">
+			<div class="form-group">
+				<label>用户名</label>
+				<input type="text" name="username" required placeholder="请输入用户名">
+			</div>
+			<div class="form-group">
+				<label>密码</label>
+				<input type="password" name="password" required placeholder="请输入密码">
+			</div>
+			<div class="form-group">
+				<label>确认密码</label>
+				<input type="password" name="confirm_password" required placeholder="请再次输入密码">
+			</div>
+			<div style="margin-top:20px;">
+				<button type="button" class="btn btn-primary" id="btnSubmitAdd">
+					<i class="fa fa-save"></i> 保存
+				</button>
+				<button type="button" class="btn btn-secondary" onclick="window.location.href='/admin/users'">
+					<i class="fa fa-arrow-left"></i> 返回
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	// 菜单切换
+	var menuToggles = document.querySelectorAll('.menu-toggle');
+	menuToggles.forEach(function(toggle) {
+		toggle.addEventListener('click', function(e) {
+			e.preventDefault();
+			var submenu = this.nextElementSibling;
+			if (submenu && submenu.classList.contains('submenu')) {
+				submenu.classList.toggle('show');
+				this.classList.toggle('active');
+			}
+		});
+	});
+
+	// 提交新增用户
+	document.getElementById('btnSubmitAdd').addEventListener('click', function() {
+		var form = document.getElementById('addUserPageForm');
+		var username = form.querySelector('input[name="username"]').value.trim();
+		var password = form.querySelector('input[name="password"]').value;
+		var confirmPassword = form.querySelector('input[name="confirm_password"]').value;
+		
+		if (!username || !password || !confirmPassword) {
+			alert('请填写所有字段');
+			return;
+		}
+		
+		if (password !== confirmPassword) {
+			alert('两次输入的密码不一致');
+			return;
+		}
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/admin/users?action=add', true);
+		xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					var response = JSON.parse(xhr.responseText);
+					alert(response.msg);
+					if (response.code === 0) {
+						window.location.href = '/admin/users';
+					}
+				}
+			}
+		};
+		xhr.send('username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password));
+	});
+});
+</script>
+{% end %}
